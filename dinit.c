@@ -4,6 +4,7 @@
 /* ALL RIGHTS RESERVED, COMMERCIAL USAGE STRICTLY PROHIBITED */
 /* WRITTEN BY R. M. SUPNIK */
 
+#include <emscripten.h>
 #include <stdio.h>
 
 #ifdef __AMOS__
@@ -94,7 +95,7 @@ FILE *indxfile;
 	*pf++ = getc(indxfile);
 }
 
-logical init_()
+logical EMSCRIPTEN_KEEPALIVE init_()
 {
     /* System generated locals */
     integer i__1;

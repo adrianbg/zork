@@ -22,6 +22,8 @@
 #endif /* ! BSD4_2 */
 #endif /* NONBUSINESS */
 
+#include <unistd.h>
+
 logical protected()
 {
 #ifndef NONBUSINESS
