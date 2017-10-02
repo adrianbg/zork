@@ -1,2 +1,7 @@
 *.o
 zork
+*.bc
+zork.data
+zork.js
+zork.wasm
+zork.wast

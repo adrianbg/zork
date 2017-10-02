@@ -7,20 +7,12 @@
 #define EXTERN
 #define INIT
 
+#include <emscripten.h>
 #include "funcs.h"
 #include "vars.h"
 
-void main(argc, argv)
-int argc;
-char **argv;
-{
-/* 1) INITIALIZE DATA STRUCTURES */
-/* 2) PLAY GAME */
-
-    if (init_()) {
-	game_();
-    }
-/* 						!IF INIT, PLAY GAME. */
-    exit_();
-/* 						!DONE */
-} /* MAIN__ */
+char * EMSCRIPTEN_KEEPALIVE get_input_buffer() {
+    more_input();
+    prsvec_1.prscon = 1;  // as if rdline_ had been called
+    return input_1.inbuf;
+}

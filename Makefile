@@ -17,11 +17,11 @@ MANDIR = /usr/share/man
 
 # more option 1: use the termcap routines.  On some systems the LIBS
 # variable may need to be set to -lcurses.  On some it may need to
-# be /usr/lib/termcap.o.  These options are commented out below.
-LIBS = -ltermcap
-TERMFLAG =
+# be /usr/lib/termcape.bc.  These options are commented out below.
+# LIBS = -ltermcap
+# TERMFLAG =
 # LIBS = -lcurses
-# LIBS = /usr/lib/termcap.o
+# LIBS = /usr/lib/termcap.bc
 
 # more option 2: use the terminfo routines.  On some systems the LIBS
 # variable needs to be -lcursesX, but probably all such systems support
@@ -34,8 +34,8 @@ TERMFLAG =
 # TERMFLAG = -DMORE_24
 
 # more option 4: don't use the more facility at all
-# LIBS =
-# TERMFLAG = -DMORE_NONE
+LIBS =
+TERMFLAG = -DMORE_NONE
 
 # End of more options
 
@@ -45,7 +45,7 @@ TERMFLAG =
 GDTFLAG = -DALLOW_GDT
 
 # Compilation flags
-CFLAGS = -g #-static
+CFLAGS = -g -static
 # On SCO Unix Development System 3.2.2a, the const type qualifier does
 # not work correctly when using cc.  The following line will cause it
 # to not be used and should be uncommented.
@@ -60,13 +60,15 @@ CSRC =	actors.c ballop.c clockr.c demons.c dgame.c dinit.c dmain.c\
 	nrooms.c objcts.c rooms.c sobjs.c supp.c sverbs.c verbs.c villns.c
 
 # Object files
-OBJS =	actors.o ballop.o clockr.o demons.o dgame.o dinit.o dmain.o\
-	dso1.o dso2.o dso3.o dso4.o dso5.o dso6.o dso7.o dsub.o dverb1.o\
-	dverb2.o gdt.o lightp.o local.o nobjs.o np.o np1.o np2.o np3.o\
-	nrooms.o objcts.o rooms.o sobjs.o supp.o sverbs.o verbs.o villns.o
-
+OBJS =	actors.bc ballop.bc clockr.bc demons.bc dgame.bc dinit.bc dmain.bc\
+	dso1.bc dso2.bc dso3.bc dso4.bc dso5.bc dso6.bc dso7.bc dsub.bc dverb1.bc\
+	dverb2.bc gdt.bc lightp.bc local.bc nobjs.bc np.bc np1.bc np2.bc np3.bc\
+	nrooms.bc objcts.bc rooms.bc sobjs.bc supp.bc sverbs.bc verbs.bc villns.bc
+# -s EMTERPRETIFY=1 -s EMTERPRETIFY_ASYNC=1
+# -s ASYNCIFY=1
 dungeon: $(OBJS) dtextc.dat
-	$(CC) $(CFLAGS) -o zork $(OBJS) $(LIBS)
+	$(CC) $(CFLAGS) -o zork.js -s WASM=1 -s NO_EXIT_RUNTIME=1 $(OBJS) $(LIBS) \
+		--preload-file dtextc.dat
 
 install: zork dtextc.dat
 	mkdir -p $(BINDIR) $(LIBDIR) $(MANDIR)/man6
@@ -80,46 +82,49 @@ clean:
 dtextc.dat:
 	cat dtextc.uu1 dtextc.uu2 dtextc.uu3 dtextc.uu4 | uudecode
 
-dinit.o: dinit.c funcs.h vars.h
-	$(CC) $(CFLAGS) $(GDTFLAG) -DTEXTFILE=\"$(DATADIR)/dtextc.dat\" -c dinit.c
+dinit.bc: dinit.c funcs.h vars.h
+	$(CC) $(CFLAGS) $(GDTFLAG) -DTEXTFILE=\"$(DATADIR)/dtextc.dat\" -c dinit.c -o $@
 
-dgame.o: dgame.c funcs.h vars.h
-	$(CC) $(CFLAGS) $(GDTFLAG) -c dgame.c
+dgame.bc: dgame.c funcs.h vars.h
+	$(CC) $(CFLAGS) $(GDTFLAG) -c dgame.c -o $@
 
-gdt.o: gdt.c funcs.h vars.h
-	$(CC) $(CFLAGS) $(GDTFLAG) -c gdt.c
+gdt.bc: gdt.c funcs.h vars.h
+	$(CC) $(CFLAGS) $(GDTFLAG) -c gdt.c -o $@
 
-local.o: local.c funcs.h vars.h
-	$(CC) $(CFLAGS) $(GDTFLAG) -c local.c
+local.bc: local.c funcs.h vars.h
+	$(CC) $(CFLAGS) $(GDTFLAG) -c local.c -o $@
 
-supp.o: supp.c funcs.h vars.h
-	$(CC) $(CFLAGS) $(TERMFLAG) -c supp.c	
+supp.bc: supp.c funcs.h vars.h
+	$(CC) $(CFLAGS) $(TERMFLAG) -c supp.c -o $@
 
-actors.o: funcs.h vars.h
-ballop.o: funcs.h vars.h
-clockr.o: funcs.h vars.h
-demons.o: funcs.h vars.h
-dmain.o: funcs.h vars.h
-dso1.o: funcs.h vars.h
-dso2.o: funcs.h vars.h
-dso3.o: funcs.h vars.h
-dso4.o: funcs.h vars.h
-dso5.o: funcs.h vars.h
-dso6.o: funcs.h vars.h
-dso7.o: funcs.h vars.h
-dsub.o: funcs.h vars.h
-dverb1.o: funcs.h vars.h
-dverb2.o: funcs.h vars.h
-lightp.o: funcs.h vars.h
-nobjs.o: funcs.h vars.h
-np.o: funcs.h vars.h
-np1.o: funcs.h vars.h parse.h
-np2.o: funcs.h vars.h parse.h
-np3.o: funcs.h vars.h parse.h
-nrooms.o: funcs.h vars.h
-objcts.o: funcs.h vars.h
-rooms.o: funcs.h vars.h
-sobjs.o: funcs.h vars.h
-sverbs.o: funcs.h vars.h
-verbs.o: funcs.h vars.h
-villns.o: funcs.h vars.h
+%.bc: %.c
+	$(CC) $(CFLAGS) $< -o $@
+
+actors.bc: funcs.h vars.h
+ballop.bc: funcs.h vars.h
+clockr.bc: funcs.h vars.h
+demons.bc: funcs.h vars.h
+dmain.bc: funcs.h vars.h
+dso1.bc: funcs.h vars.h
+dso2.bc: funcs.h vars.h
+dso3.bc: funcs.h vars.h
+dso4.bc: funcs.h vars.h
+dso5.bc: funcs.h vars.h
+dso6.bc: funcs.h vars.h
+dso7.bc: funcs.h vars.h
+dsub.bc: funcs.h vars.h
+dverb1.bc: funcs.h vars.h
+dverb2.bc: funcs.h vars.h
+lightp.bc: funcs.h vars.h
+nobjs.bc: funcs.h vars.h
+np.bc: funcs.h vars.h
+np1.bc: funcs.h vars.h parse.h
+np2.bc: funcs.h vars.h parse.h
+np3.bc: funcs.h vars.h parse.h
+nrooms.bc: funcs.h vars.h
+objcts.bc: funcs.h vars.h
+rooms.bc: funcs.h vars.h
+sobjs.bc: funcs.h vars.h
+sverbs.bc: funcs.h vars.h
+verbs.bc: funcs.h vars.h
+villns.bc: funcs.h vars.h

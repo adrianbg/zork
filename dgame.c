@@ -4,6 +4,7 @@
 /* ALL RIGHTS RESERVED, COMMERCIAL USAGE STRICTLY PROHIBITED */
 /* WRITTEN BY R. M. SUPNIK */
 
+#include <emscripten.h>
 #include <stdio.h>
 #include "funcs.h"
 #include "vars.h"
@@ -15,11 +16,19 @@ extern int strcmp P((const char *, const char *));
 static logical xvehic_ P((integer));
 static void xendmv_ P((logical));
 
-void game_()
+integer EMSCRIPTEN_KEEPALIVE game_(int goto_label)
 {
     /* Local variables */
-    logical f;
-    integer i;
+    static logical f;
+    static integer i;
+
+    // jump directly to each place we read input
+    switch (goto_label) {
+        case 100:
+            goto L100_after;
+        case 1000:
+            goto L1000_after;
+    }
 
 /* START UP, DESCRIBE CURRENT LOCATION. */
 
@@ -36,8 +45,10 @@ L100:
     play_1.telflg = FALSE_;
 /* 						!ASSUME NOTHING TOLD. */
     if (prsvec_1.prscon <= 1) {
-	rdline_(input_1.inbuf, 1);
+	//rdline_(input_1.inbuf, 1);
+    return 100;
     }
+L100_after:
 
 #ifdef ALLOW_GDT
 
@@ -97,7 +108,9 @@ L900:
 /* IF INPUT IS NOT 'ECHO' OR A DIRECTION, JUST ECHO. */
 
 L1000:
-    rdline_(input_1.inbuf, 0);
+    //rdline_(input_1.inbuf, 0);
+    return 1000;
+L1000_after:
     ++state_1.moves;
 /* 						!CHARGE FOR MOVES. */
     if (strcmp(input_1.inbuf, "ECHO") != 0)
